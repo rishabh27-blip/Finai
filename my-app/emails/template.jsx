@@ -10,41 +10,46 @@ import {
 } from "@react-email/components";
 import * as React from "react";
 
-
 export default function EmailTemplate({
-  
-    userName = "",
-    type = "monthly-report",
-    data = {},
+  userName = "",
+  type = "monthly-report",
+  data = {},
 }) {
+  const totalIncome = data?.stats?.totalIncome ?? "N/A";
+  const totalExpenses = data?.stats?.totalExpenses ?? "N/A";
+  const netIncome =
+    typeof totalIncome === "number" && typeof totalExpenses === "number"
+      ? totalIncome - totalExpenses
+      : "N/A";
+
   if (type === "monthly-report") {
     return (
       <Html>
         <Head />
-        <Preview>Your Monthly Financial Report</Preview>
+        <Preview>Your Monthly Financial Report 🎉</Preview>
         <Body style={styles.body}>
           <Container style={styles.container}>
-            <Heading style={styles.title}>Monthly Financial Report</Heading>
+            <Heading style={styles.title}>📊 Monthly Financial Report</Heading>
 
-            <Text style={styles.text}>Hello {userName},</Text>
+            <Text style={styles.text}>Hello {userName} 👋,</Text>
             <Text style={styles.text}>
-              Here&rsquo;s your financial summary for {data?.month}:
+              Here’s your financial summary for <b>{data?.month ?? "this month"}</b>:
             </Text>
 
             {/* Main Stats */}
             <Section style={styles.statsContainer}>
               <div style={styles.stat}>
-                <Text style={styles.text}>Total Income</Text>
-                <Text style={styles.heading}>${data?.stats.totalIncome}</Text>
+                <Text style={styles.label}>💰 Total Income</Text>
+                <Text style={styles.amount}>${totalIncome}</Text>
               </div>
               <div style={styles.stat}>
-                <Text style={styles.text}>Total Expenses</Text>
-                <Text style={styles.heading}>${data?.stats.totalExpenses}</Text>
+                <Text style={styles.label}>💸 Total Expenses</Text>
+                <Text style={styles.amount}>${totalExpenses}</Text>
               </div>
               <div style={styles.stat}>
-                <Text style={styles.text}>Net</Text>
-                <Text style={styles.heading}>
-                  ${data?.stats.totalIncome - data?.stats.totalExpenses}
+                <Text style={styles.label}>🔄 Net</Text>
+                <Text style={styles.amount}>
+                  ${netIncome}
                 </Text>
               </div>
             </Section>
@@ -52,12 +57,12 @@ export default function EmailTemplate({
             {/* Category Breakdown */}
             {data?.stats?.byCategory && (
               <Section style={styles.section}>
-                <Heading style={styles.heading}>Expenses by Category</Heading>
-                {Object.entries(data?.stats.byCategory).map(
+                <Heading style={styles.subheading}>📂 Expenses by Category</Heading>
+                {Object.entries(data.stats.byCategory).map(
                   ([category, amount]) => (
                     <div key={category} style={styles.row}>
                       <Text style={styles.text}>{category}</Text>
-                      <Text style={styles.text}>${amount}</Text>
+                      <Text style={styles.text}>${amount ?? "N/A"}</Text>
                     </div>
                   )
                 )}
@@ -65,9 +70,9 @@ export default function EmailTemplate({
             )}
 
             {/* AI Insights */}
-            {data?.insights && (
+            {data?.insights?.length > 0 && (
               <Section style={styles.section}>
-                <Heading style={styles.heading}>Welth Insights</Heading>
+                <Heading style={styles.subheading}>💡 Finai Insights</Heading>
                 {data.insights.map((insight, index) => (
                   <Text key={index} style={styles.text}>
                     • {insight}
@@ -77,8 +82,7 @@ export default function EmailTemplate({
             )}
 
             <Text style={styles.footer}>
-              Thank you for using Welth. Keep tracking your finances for better
-              financial health!
+              🚀 Stay on top of your finances with Finai! Happy saving! 🎉
             </Text>
           </Container>
         </Body>
@@ -86,104 +90,84 @@ export default function EmailTemplate({
     );
   }
 
-  if (type === "budget-alert") {
-    return (
-      <Html>
-        <Head />
-        <Preview>Budget Alert</Preview>
-        <Body style={styles.body}>
-          <Container style={styles.container}>
-            <Heading style={styles.title}>Budget Alert</Heading>
-            <Text style={styles.text}>Hello {userName},</Text>
-            <Text style={styles.text}>
-              You&rsquo;ve used {data?.percentageUsed.toFixed(1)}% of your
-              monthly budget.
-            </Text>
-            <Section style={styles.statsContainer}>
-              <div style={styles.stat}>
-                <Text style={styles.text}>Budget Amount</Text>
-                <Text style={styles.heading}>${data?.budgetAmount}</Text>
-              </div>
-              <div style={styles.stat}>
-                <Text style={styles.text}>Spent So Far</Text>
-                <Text style={styles.heading}>${data?.totalExpenses}</Text>
-              </div>
-              <div style={styles.stat}>
-                <Text style={styles.text}>Remaining</Text>
-                <Text style={styles.heading}>
-                  ${data?.budgetAmount - data?.totalExpenses}
-                </Text>
-              </div>
-            </Section>
-          </Container>
-        </Body>
-      </Html>
-    );
-  }
+  return null; // Default return if type doesn't match
 }
 
 const styles = {
   body: {
-    backgroundColor: "#f6f9fc",
-    fontFamily: "-apple-system, sans-serif",
+    background: "linear-gradient(135deg, #6EE7B7, #3B82F6)", // Energetic Gradient
+    fontFamily: "'Inter', sans-serif",
+    color: "#fff",
   },
   container: {
     backgroundColor: "#ffffff",
     margin: "0 auto",
-    padding: "20px",
-    borderRadius: "5px",
-    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+    padding: "24px",
+    borderRadius: "12px",
+    boxShadow: "0 5px 10px rgba(0,0,0,0.1)",
+    maxWidth: "600px",
   },
   title: {
-    color: "#1f2937",
-    fontSize: "32px",
+    color: "#1E40AF",
+    fontSize: "28px",
     fontWeight: "bold",
     textAlign: "center",
-    margin: "0 0 20px",
+    marginBottom: "20px",
   },
-  heading: {
-    color: "#1f2937",
-    fontSize: "20px",
+  subheading: {
+    color: "#1E3A8A",
+    fontSize: "22px",
     fontWeight: "600",
-    margin: "0 0 16px",
+    marginBottom: "12px",
   },
   text: {
-    color: "#4b5563",
+    color: "#374151",
     fontSize: "16px",
-    margin: "0 0 16px",
+    marginBottom: "16px",
   },
   section: {
-    marginTop: "32px",
-    padding: "20px",
-    backgroundColor: "#f9fafb",
-    borderRadius: "5px",
-    border: "1px solid #e5e7eb",
+    marginTop: "20px",
+    padding: "16px",
+    background: "rgba(255,255,255,0.8)",
+    borderRadius: "10px",
+    boxShadow: "0 2px 5px rgba(0,0,0,0.08)",
   },
   statsContainer: {
-    margin: "32px 0",
-    padding: "20px",
-    backgroundColor: "#f9fafb",
-    borderRadius: "5px",
+    margin: "20px 0",
+    display: "flex",
+    justifyContent: "space-between",
+    gap: "16px",
   },
   stat: {
-    marginBottom: "16px",
+    flex: 1,
     padding: "12px",
-    backgroundColor: "#fff",
-    borderRadius: "4px",
-    boxShadow: "0 1px 2px rgba(0, 0, 0, 0.05)",
+    borderRadius: "8px",
+    background: "rgba(255,255,255,0.9)",
+    boxShadow: "0 3px 6px rgba(0,0,0,0.07)",
+    textAlign: "center",
+  },
+  label: {
+    fontSize: "16px",
+    fontWeight: "500",
+    color: "#1E40AF",
+  },
+  amount: {
+    fontSize: "22px",
+    fontWeight: "700",
+    color: "#059669",
   },
   row: {
     display: "flex",
     justifyContent: "space-between",
-    padding: "12px 0",
-    borderBottom: "1px solid #e5e7eb",
+    padding: "10px 0",
+    borderBottom: "1px solid #E5E7EB",
   },
   footer: {
-    color: "#6b7280",
+    color: "#6B7280",
     fontSize: "14px",
     textAlign: "center",
-    marginTop: "32px",
+    marginTop: "24px",
     paddingTop: "16px",
-    borderTop: "1px solid #e5e7eb",
+    borderTop: "1px solid #E5E7EB",
   },
 };
